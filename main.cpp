@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
+#include <set>
 
 class SuperSet {
     public:
@@ -26,13 +27,36 @@ class SuperSet {
             }
             return superset;
         }
+
+        std::set < std::set < int > > RecursiveSolution ( std::set<int> set ) {
+            if ( set.size() == 0 ) return {};
+
+            std::set < std::set < int > > results;
+            for ( auto item : set ) {
+                auto setCopy = set;
+                setCopy.erase ( item );
+                auto temp = RecursiveSolution ( setCopy );
+                for ( auto subset : temp ) {
+                    // add this item to the results set
+                    results.insert ( subset );
+                    // add item to the set
+                    subset.insert(item);
+                    // add augmented set to the resutls
+                    results.insert ( subset );
+                }
+                results.insert( { item } ) ;
+            }
+
+        return  results;
+        }
+
 };
 
 int main( int argc, char* argv[] ) {
     using namespace std;
 
     SuperSet p;
-    auto s = p.IterativeSolutionUsingBits ( vector<int> { 1, 2, 3 } );
+    auto s = p.IterativeSolutionUsingBits ( { 1, 2, 3, 4, 5 } );
 
     cout << "{ " << endl;
     for (int i=0; i < s.size() ; i++ ) {
@@ -46,6 +70,28 @@ int main( int argc, char* argv[] ) {
         if ( i != ( s.size() -1 ) )
             cout << ", ";
         cout << endl;
+    }
+    cout << "}" << endl;
+
+    auto s2 = p.RecursiveSolution           ( { 1, 2, 3, 4, 5 } );
+    cout << "{ " << endl;
+    int i = 0;
+    for (auto subset : s2 ) {
+        cout << "{ " ;
+        int j=0;
+        for ( auto item : subset ) {
+            cout << item;
+            if ( j != (subset.size() - 1 ) ) 
+                cout << ", ";
+
+            j++;
+        }
+        cout << " }" ;
+        if ( i != ( s.size() -1 ) )
+            cout << ", ";
+        cout << endl;
+
+        i++;
     }
     cout << "}" << endl;
     return 0;
